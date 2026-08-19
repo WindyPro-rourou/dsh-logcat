@@ -7,4 +7,4 @@
 # web GUI.
 - insert:
     - id: logcat
-      name: '@linxin666/dsh-logcat'
+      name: '@windypro-rourou/dsh-logcat'

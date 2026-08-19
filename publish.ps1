@@ -85,7 +85,7 @@ if ($env:GH_TOKEN) {
 if ($env:NPM_TOKEN) {
   npm config set "//registry.npmjs.org/:_authToken=$env:NPM_TOKEN" | Out-Null
   # 包 scope = GitHub 用户名（npm 用 GitHub 登录后，@scope 即用户名）。
-  # 把 package.json 的 name 改成 @<user>/dsh-logcat，否则发布到 @linxin666 会因无权而失败。
+  # 把 package.json 的 name 改成 @<user>/dsh-logcat，否则发布到别的 scope 会因无权而失败。
   $pkg = Get-Content package.json -Raw | ConvertFrom-Json
   $pkg.name = "@$user/dsh-logcat"
   $pkg | ConvertTo-Json -Depth 10 | Set-Content package.json -Encoding UTF8
