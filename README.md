@@ -1,0 +1,55 @@
+# dsh-logcat
+
+DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视图）。
+
+## 功能
+
+- **自动连接**：探测本机 adb（`ANDROID_HOME` / `ANDROID_SDK_ROOT` / 默认 `%LOCALAPPDATA%\Android\Sdk` / PATH），
+  每 2 秒轮询 `adb devices -l`；检测到处于调试模式的设备**自动附加 logcat 流**（`-v threadtime`），无需打开面板。
+- **实时日志**：WebSocket 推送，每设备保留最近 2000 行环形缓冲；断线自动重连（指数退避）。
+- **Logcat 面板**（侧边栏「Logcat」入口）：
+  - 设备下拉（显示型号/序列号/状态，记住上次选择）
+  - 级别过滤（V/D/I/W/E/F 单选，颜色与 Android Studio 一致）
+  - 关键词过滤、暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
+  - 窗口化渲染 + 自动滚动（滚动手动上翻时自动停用）
+  - 未授权设备提示「请在手机上点击允许 USB 调试」
+- **Agent 工具**：`logcat_recent`（读取某设备最近 N 条日志，支持级别/关键词过滤）。
+- **附加能力**：`POST /api/dsh-logcat/exec` 可对设备执行 `adb shell` 命令（UI 后续版本可扩展）。
+
+## 安装
+
+```bash
+# 方式一（推荐，npm 安装）：
+dsh plugin --profile web add @windypro-rourou/dsh-logcat
+
+# 方式二（源码本地链接，实时生效无需重启）：把插件链进 web profile，
+# 并在 ~/.dsh/profiles/web/cordis.patch.yml 增加一行：
+pnpm --dir "%USERPROFILE%\.dsh\profiles\web" add link:F:\dsh-logcat
+#   然后在 profile 的 cordis.patch.yml 追加：
+#   - insert:
+#       - id: logcat
+#         name: '@windypro-rourou/dsh-logcat'
+# 该 patch 文件会被运行中的 GUI 热监听；若未生效，重启 GUI 即可。
+
+# 方式三（bundle 层，README 原始流程，适合全新 profile；与方式二互斥，勿混用）：
+dsh plugin --profile web add link:<本目录绝对路径>
+# 之后需要重启 GUI（dsh web）才会装载。
+```
+
+> 注意：以上方式都会在 profile 树中插入同一行 `logcat`，不要同时使用，否则下次
+> 启动会因重复插件 id 而失败。
+
+依赖解析：`ws` / `react` / `react-dom` / `@deepseek-ai/*` 通过本目录 `node_modules` 下的 junction 指向宿主
+实际加载的物理包（保证单例）。若宿主依赖升级，请同步更新 junction 目标。
+
+## 限制
+
+- 需要设备开启 USB 调试并在手机上授权本机（`unauthorized` 状态会提示）。
+- logcat 输出可能含敏感信息；`/api/dsh-logcat/*` 路由仅允许 loopback 访问。
+- `adb shell` 命令消耗真实设备资源，先确认再执行。
+
+## 文件
+
+- `lib/index.js` — 宿主端：adb 引擎、轮询、logcat 子进程、路由、WebSocket、agent 工具。
+- `lib/client.js` — 浏览器端：侧边栏入口 + Logcat 面板（React，无构建步骤）。
+- `cordis.patch.yml` — profile bundle patch（自动应用）。

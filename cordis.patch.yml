@@ -1,0 +1,10 @@
+# dsh-logcat bundle patch: inserts the logcat plugin row into the web
+# profile roster. Applied as a profile bundle layer over dsh-base; the row is
+# a bare plugin by package name — the node half (exports ".") runs in the
+# host process (adb engine, /api/dsh-logcat routes, WebSocket stream, agent
+# tools), and the `dsh.client` declaration in package.json makes the browser
+# half (exports "./client", served at /plugins/logcat/client.js) load in the
+# web GUI.
+- insert:
+    - id: logcat
+      name: '@linxin666/dsh-logcat'

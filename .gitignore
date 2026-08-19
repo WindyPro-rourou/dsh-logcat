@@ -1,0 +1,7 @@
+# dsh-logcat — repo hygiene
+node_modules/
+*.log
+.DS_Store
+*.tgz
+
+.npmrc.tmp
