@@ -13,7 +13,13 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
   - 关键词过滤、暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
   - 窗口化渲染 + 自动滚动（滚动手动上翻时自动停用）
   - 未授权设备提示「请在手机上点击允许 USB 调试」
-- **Agent 工具**：`logcat_recent`（读取某设备最近 N 条日志，支持级别/关键词过滤）。
+- **Agent 工具**：
+  - `logcat_devices`：列出已连接设备（serial / model / state），判断能否实机调试。
+  - `adb_exec`：在指定设备执行 `adb shell` 命令（安装 APK、启动 Activity、查进程、截图、dump UI 等），
+    破坏性操作（卸载 / 重启 / 清数据）需先确认。
+  - `logcat_recent`：读取某设备最近 N 条日志，支持级别 / 关键词过滤。
+- **实机调试工作流**：构建安卓应用时，agent 的通告会动态列出当前已连接设备（serial + 型号），
+  可先向用户确认后用 `adb_exec` 安装 / 启动、`logcat_recent` 查看崩溃日志，闭环真机调试。
 - **附加能力**：`POST /api/dsh-logcat/exec` 可对设备执行 `adb shell` 命令（UI 后续版本可扩展）。
 
 ## 安装
