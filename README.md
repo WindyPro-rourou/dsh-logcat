@@ -10,20 +10,25 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
 - **Logcat 面板**（侧边栏「Logcat」入口，右侧抽屉，**宽度可拖拽调整并记忆**）：
   - 设备下拉（显示型号/序列号/状态，记住上次选择）
   - 级别过滤（V/D/I/W/E/F 单选，颜色与 Android Studio 一致）
-  - 关键词过滤、暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
+  - 关键词过滤、**测试包名输入框**（回车设置，与 agent 的 `logcat_set_package` 互通，状态栏实时显示）
+  - **截图按钮**：一键截取真机屏幕并下载 PNG（`exec-out screencap`）
+  - 暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
   - 窗口化渲染 + 自动滚动（滚动手动上翻时自动停用）
   - 未授权设备提示「请在手机上点击允许 USB 调试」
 - **Agent 工具**：
   - `logcat_devices`：列出已连接设备（serial / model / state），判断能否实机调试。
-  - `adb_exec`：在指定设备执行 `adb shell` 命令（安装 APK、启动 Activity、查进程、截图、dump UI 等），
+  - `adb_exec`：在指定设备执行 `adb shell` 命令（启动 Activity、查进程、dump UI 等），
     破坏性操作（卸载 / 重启 / 清数据）需先确认。
+  - `adb_install`：把**本地 APK 安装到真机**（`adb install -r <本地路径>`，构建产物直接部署）。
+  - `adb_pull`：从设备拉取文件到本地（截图 / 日志 / bugreport）。
   - `logcat_set_package`：设置 / 清除当前测试的 app 包名（安装 / 启动应用后调用）。
   - `logcat_recent`：读取某设备最近 N 条日志，支持级别 / 关键词过滤；
     设置了测试包名（或显式传 `package`）时自动按该 app 的 pid 过滤日志。
 - **实机调试工作流**：构建安卓应用时，agent 的通告会动态列出当前已连接设备（serial + 型号）与当前测试包名，
-  可先向用户确认后用 `adb_exec` 安装 / 启动、`logcat_set_package` 锁定目标 app、`logcat_recent` 按包名查看崩溃日志，
-  闭环真机调试。
-- **附加能力**：`POST /api/dsh-logcat/exec` 可对设备执行 `adb shell` 命令（UI 后续版本可扩展）。
+  可先向用户确认后用 `adb_install` 部署 APK → `adb_exec` 启动 → `logcat_set_package` 锁定目标 app →
+  `logcat_recent` 按包名查看崩溃日志 → `adb_pull` 拉取截图 / 日志，闭环真机调试。
+- **附加能力**：`POST /api/dsh-logcat/exec` 执行 shell、`POST /api/dsh-logcat/package` 设置包名、
+  `GET /api/dsh-logcat/screenshot` 截屏。
 
 ## 安装
 
