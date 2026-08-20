@@ -4,8 +4,10 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
 
 ## 功能
 
-- **自动连接**：探测本机 adb（`ANDROID_HOME` / `ANDROID_SDK_ROOT` / 默认 `%LOCALAPPDATA%\Android\Sdk` / PATH），
-  每 2 秒轮询 `adb devices -l`；检测到处于调试模式的设备**自动附加 logcat 流**（`-v threadtime`），无需打开面板。
+- **自动连接**：探测本机 adb（`ANDROID_HOME` / `ANDROID_SDK_ROOT` / 默认 `%LOCALAPPDATA%\Android\Sdk` / PATH /
+  `~/.dsh/adb`），每 2 秒轮询 `adb devices -l`；检测到处于调试模式的设备**自动附加 logcat 流**（`-v threadtime`），无需打开面板。
+- **一键安装 adb**：未找到 adb 时，面板状态栏显示「一键安装 adb」按钮 —— 从 USTC 镜像（Google 官方兜底）
+  下载 platform-tools 解压到 `~/.dsh/adb` 并自动接入，开箱即用（约 10MB）。
 - **实时日志**：WebSocket 推送，每设备保留最近 2000 行环形缓冲；断线自动重连（指数退避）。
 - **Logcat 面板**（侧边栏「Logcat」入口，右侧抽屉，**宽度可拖拽调整并记忆**）：
   - 设备下拉（显示型号/序列号/状态，记住上次选择）
