@@ -48,6 +48,19 @@ dsh plugin --profile web update                # 升到当前 major 内最新
 # 或强制最新：dsh plugin --profile web add @windypro-rourou/dsh-logcat@latest
 # 更新后重启 GUI（dsh web）生效
 
+# 尝鲜 preview 版（日常迭代高频更新，可能不稳定）：
+dsh plugin --profile web add @windypro-rourou/dsh-logcat@preview
+```
+
+## 发布策略（main / preview 双通道）
+
+- **`main` 分支 + npm `latest` 标签**：稳定正式版，**低频发布**，每次至少凑够 3-4 个功能再发，
+  避免频繁更新提醒打扰用户。
+- **`preview` 分支 + npm `preview` 标签**：日常迭代，有啥更啥（高频），供尝鲜用户测试；
+  凑够足够功能后合并回 `main` 批量发布正式版。
+- 版本自检会按安装通道提示（正式版用户只看 `latest`，preview 用户只看 `preview`，互不打扰）。
+
+```bash
 # 方式二（源码本地链接，实时生效无需重启）：把插件链进 web profile，
 # 并在 ~/.dsh/profiles/web/cordis.patch.yml 增加一行：
 pnpm --dir "%USERPROFILE%\.dsh\profiles\web" add link:F:\dsh-logcat
