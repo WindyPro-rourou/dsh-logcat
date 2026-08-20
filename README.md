@@ -43,6 +43,11 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
 # 方式一（推荐，npm 安装）：
 dsh plugin --profile web add @windypro-rourou/dsh-logcat
 
+# 更新到最新版（不会自动更新；装旧版时面板/agent 通告会提示有新版本）：
+dsh plugin --profile web update                # 升到当前 major 内最新
+# 或强制最新：dsh plugin --profile web add @windypro-rourou/dsh-logcat@latest
+# 更新后重启 GUI（dsh web）生效
+
 # 方式二（源码本地链接，实时生效无需重启）：把插件链进 web profile，
 # 并在 ~/.dsh/profiles/web/cordis.patch.yml 增加一行：
 pnpm --dir "%USERPROFILE%\.dsh\profiles\web" add link:F:\dsh-logcat
