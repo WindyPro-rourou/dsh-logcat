@@ -18,19 +18,22 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
   - 暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
   - 窗口化渲染 + 自动滚动（滚动手动上翻时自动停用）
   - 未授权设备提示「请在手机上点击允许 USB 调试」
-- **Agent 工具**（共 18 个，全部对 agent 开放，前置提示中已明示可调用）：
+- **Agent 工具**（共 21 个，全部对 agent 开放，前置提示中已明示可调用）：
   - 设备：`logcat_devices`（列出设备）、`device_info`（型号/版本/SDK/分辨率/内存/电量）、`device_stats`（CPU/内存/电量实时采样）
   - 执行：`adb_exec`（shell）、`adb_install`（本地 APK 装真机）、`adb_pull`（拉文件）
   - 输入：`input_tap` / `input_swipe` / `input_text`（真机 UI 自动化）、`ui_dump`（界面层级 XML）
   - 日志：`logcat_recent`（按包名/级别/关键词过滤）、`logcat_crash`（崩溃/ANR 自动捕获 + 上下文）、
     `logcat_set_package`（锁定当前测试包名）
   - 逆向/内存：`proc_list`（进程列表）、`proc_maps`（内存映射 + so 模块基址）、`proc_status`（进程状态/内存摘要）、
-    `mem_dump`（指定地址读内存 hex）、`frida_server`（frida-server 部署/启停）
+    `proc_smaps`（smaps 明细，Pss Top 区域）、`mem_dump`（指定地址读内存 hex）、
+    `mem_search`（内存搜 hex 模式/字符串）、`frida_server`（frida-server 部署/启停）、
+    `frida_script`（hook/trace/scan/bypass/dump 常用脚本模板生成）
 - **实机调试工作流**：构建安卓应用时，agent 的通告会动态列出当前已连接设备（serial + 型号）与当前测试包名，
   可先向用户确认后：`adb_install` 部署 APK → `adb_exec` 启动 → `logcat_set_package` 锁包 →
   `logcat_recent` / `logcat_crash` 看崩溃 → `ui_dump` + `input_*` 做界面自动化 → `adb_pull` 取证，闭环真机调试。
-- **逆向工作流**：`proc_list` 定位进程 → `proc_maps` 拿模块基址/权限 → `mem_dump` 读目标地址 →
-  `frida_server` 起 frida 做动态插桩。读其他应用内存/maps 需要 root 或 debuggable 应用（run-as），工具会给出明确提示。
+- **逆向工作流**：`proc_list` 定位进程 → `proc_maps` 拿模块基址 → `mem_dump` 读目标地址 / `mem_search` 搜特征模式 →
+  `proc_smaps` 看内存占用明细 → `frida_script` 生成脚本 + `frida_server` 起 frida 做动态插桩。
+  读其他应用内存/maps 需要 root 或 debuggable 应用（run-as），工具会给出明确提示。
 - **附加能力**：`POST /api/dsh-logcat/exec` 执行 shell、`POST /api/dsh-logcat/package` 设置包名、
   `GET /api/dsh-logcat/screenshot` 截屏、`POST /api/dsh-logcat/install-adb` 一键装 adb。
 
