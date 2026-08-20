@@ -14,23 +14,25 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
   - 级别过滤（V/D/I/W/E/F 单选，颜色与 Android Studio 一致）
   - 关键词过滤、**测试包名输入框**（回车设置，与 agent 的 `logcat_set_package` 互通，状态栏实时显示）
   - **截图按钮**：一键截取真机屏幕并下载 PNG（`exec-out screencap`）
+  - **崩溃高亮**：FATAL EXCEPTION / ANR 行红色高亮，一眼定位崩溃
   - 暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
   - 窗口化渲染 + 自动滚动（滚动手动上翻时自动停用）
   - 未授权设备提示「请在手机上点击允许 USB 调试」
-- **Agent 工具**：
-  - `logcat_devices`：列出已连接设备（serial / model / state），判断能否实机调试。
-  - `adb_exec`：在指定设备执行 `adb shell` 命令（启动 Activity、查进程、dump UI 等），
-    破坏性操作（卸载 / 重启 / 清数据）需先确认。
-  - `adb_install`：把**本地 APK 安装到真机**（`adb install -r <本地路径>`，构建产物直接部署）。
-  - `adb_pull`：从设备拉取文件到本地（截图 / 日志 / bugreport）。
-  - `logcat_set_package`：设置 / 清除当前测试的 app 包名（安装 / 启动应用后调用）。
-  - `logcat_recent`：读取某设备最近 N 条日志，支持级别 / 关键词过滤；
-    设置了测试包名（或显式传 `package`）时自动按该 app 的 pid 过滤日志。
+- **Agent 工具**（共 18 个，全部对 agent 开放，前置提示中已明示可调用）：
+  - 设备：`logcat_devices`（列出设备）、`device_info`（型号/版本/SDK/分辨率/内存/电量）、`device_stats`（CPU/内存/电量实时采样）
+  - 执行：`adb_exec`（shell）、`adb_install`（本地 APK 装真机）、`adb_pull`（拉文件）
+  - 输入：`input_tap` / `input_swipe` / `input_text`（真机 UI 自动化）、`ui_dump`（界面层级 XML）
+  - 日志：`logcat_recent`（按包名/级别/关键词过滤）、`logcat_crash`（崩溃/ANR 自动捕获 + 上下文）、
+    `logcat_set_package`（锁定当前测试包名）
+  - 逆向/内存：`proc_list`（进程列表）、`proc_maps`（内存映射 + so 模块基址）、`proc_status`（进程状态/内存摘要）、
+    `mem_dump`（指定地址读内存 hex）、`frida_server`（frida-server 部署/启停）
 - **实机调试工作流**：构建安卓应用时，agent 的通告会动态列出当前已连接设备（serial + 型号）与当前测试包名，
-  可先向用户确认后用 `adb_install` 部署 APK → `adb_exec` 启动 → `logcat_set_package` 锁定目标 app →
-  `logcat_recent` 按包名查看崩溃日志 → `adb_pull` 拉取截图 / 日志，闭环真机调试。
+  可先向用户确认后：`adb_install` 部署 APK → `adb_exec` 启动 → `logcat_set_package` 锁包 →
+  `logcat_recent` / `logcat_crash` 看崩溃 → `ui_dump` + `input_*` 做界面自动化 → `adb_pull` 取证，闭环真机调试。
+- **逆向工作流**：`proc_list` 定位进程 → `proc_maps` 拿模块基址/权限 → `mem_dump` 读目标地址 →
+  `frida_server` 起 frida 做动态插桩。读其他应用内存/maps 需要 root 或 debuggable 应用（run-as），工具会给出明确提示。
 - **附加能力**：`POST /api/dsh-logcat/exec` 执行 shell、`POST /api/dsh-logcat/package` 设置包名、
-  `GET /api/dsh-logcat/screenshot` 截屏。
+  `GET /api/dsh-logcat/screenshot` 截屏、`POST /api/dsh-logcat/install-adb` 一键装 adb。
 
 ## 安装
 
