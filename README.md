@@ -2,6 +2,8 @@
 
 DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视图）。
 
+[中文](README.md) | [English](README.en.md)
+
 ## 功能
 
 - **自动连接**：探测本机 adb（`ANDROID_HOME` / `ANDROID_SDK_ROOT` / 默认 `%LOCALAPPDATA%\Android\Sdk` / PATH /
