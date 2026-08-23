@@ -74,12 +74,11 @@ dsh plugin --profile web update                # 升到当前 major 内最新
 dsh plugin --profile web add @windypro-rourou/dsh-logcat@preview
 ```
 
-## 发布策略（main / preview 双通道）
+## 发布策略（main / latest 为主）
 
-- **`main` 分支 + npm `latest` 标签**：稳定正式版，**低频发布**，每次至少凑够 3-4 个功能再发，
-  避免频繁更新提醒打扰用户。
-- **`preview` 分支 + npm `preview` 标签**：日常迭代，有啥更啥（高频），供尝鲜用户测试；
-  凑够足够功能后合并回 `main` 批量发布正式版。
+- **`main` 分支 + npm `latest` 标签**：正式版，更新的主要通道 —— 功能攒够一批就发，直接推 main/latest。
+- **`preview` 分支 + npm `preview` 标签**：可选尝鲜通道（高频小步迭代）。正式版发布后如无新的试验特性，
+  preview 标签可能停留在上一个预览版本，不必理会。
 - 版本自检会按安装通道提示（正式版用户只看 `latest`，preview 用户只看 `preview`，互不打扰）。
 
 ```bash
