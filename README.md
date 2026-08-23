@@ -23,13 +23,16 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
   - **装APK 按钮**：本地文件选择器选 APK 直接安装到当前设备（流式上传，1GB 上限）
   - **设备快捷按键**：Home / 返回 / 最近任务 / 唤醒 / 电源 / 音量 ± 一键发送
   - **性能曲线**：CPU / 内存 / 电量每 2s 采样，状态栏 sparkline 趋势图
-  - **逆向工作台（日志/逆向双 tab）**：进程列表 → 内存 hex/字符串搜索 → 匹配地址 → 点击转储 256B 查看
+  - **屏幕实时投屏与远程操控**：「屏幕」tab 开启 ~1fps 实时画面（WS 二进制帧推送），**点击=点按、拖动=滑动**、
+    文字输入框直接发到手机、快捷按键（Home/返回/唤醒/音量）、一键下载当前帧 —— 不用拿起手机
+  - **逆向工作台（日志/屏幕/逆向三 tab）**：进程列表 → 内存 hex/字符串搜索 → 匹配地址 → 点击转储 256B 查看
   - 暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
   - 窗口化渲染 + 自动滚动（滚动手动上翻时自动停用）
   - 未授权设备提示「请在手机上点击允许 USB 调试」
-- **Agent 工具**（共 29 个，全部对 agent 开放，前置提示中已明示可调用）：
+- **Agent 工具**（共 30 个，全部对 agent 开放，前置提示中已明示可调用）：
   - 设备：`logcat_devices`（列出设备）、`device_info`（型号/版本/SDK/分辨率/内存/电量）、`device_stats`（CPU/内存/电量实时采样）、
     `app_info`（已安装应用版本号/versionCode/APK 路径）
+  - 屏幕/多模态：`screen_capture`（截图存档 + 嵌入对话图片块，多模态模型可直接看图配合 `input_*` 修 bug）
   - 执行：`adb_exec`（shell）、`adb_install`（本地 APK 装真机）、`adb_pull`（拉文件）、
     `app_launch`（启动应用/指定 Activity）、`app_stop`（force-stop，破坏性先确认）
   - 输入：`input_tap` / `input_swipe` / `input_text` / `input_keyevent`（真机 UI 自动化）、`ui_dump`（界面层级 XML）、

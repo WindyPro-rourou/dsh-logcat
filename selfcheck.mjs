@@ -37,7 +37,7 @@ console.log(`tools registered: ${tools.length} (${tools.map((t) => t.name).join(
 console.log(`system-prompt sections: ${sections.length}`)
 
 // Exercise a few tools (no device attached -> graceful empty results).
-const EXERCISE = ['logcat_recent', 'logcat_history', 'logcat_events', 'crash_sessions', 'app_info', 'activity_current', 'input_keyevent', 'app_launch', 'app_stop']
+const EXERCISE = ['logcat_recent', 'logcat_history', 'logcat_events', 'crash_sessions', 'app_info', 'activity_current', 'input_keyevent', 'app_launch', 'app_stop', 'screen_capture']
 for (const toolName of EXERCISE) {
   const tool = tools.find((t) => t.name === toolName)
   if (tool === undefined) { console.log(`MISSING TOOL: ${toolName}`); continue }
@@ -46,7 +46,7 @@ for (const toolName of EXERCISE) {
 }
 
 // Critical tool count check.
-const EXPECTED = 29
+const EXPECTED = 30
 if (tools.length !== EXPECTED) {
   console.log(`FAIL: expected ${EXPECTED} tools, got ${tools.length}`)
   process.exitCode = 1
