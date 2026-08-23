@@ -36,11 +36,20 @@ console.log(`upgrade routes: ${upgrades.length} (${upgrades.map((u) => u.path).j
 console.log(`tools registered: ${tools.length} (${tools.map((t) => t.name).join(', ')})`)
 console.log(`system-prompt sections: ${sections.length}`)
 
-// Exercise the logcat_recent tool (no device attached -> empty entries).
-const recentTool = tools.find((t) => t.name === 'logcat_recent')
-if (recentTool !== undefined) {
-  const result = await recentTool.execute({ lines: 10 })
-  console.log('logcat_recent execute:', JSON.stringify(result))
+// Exercise a few tools (no device attached -> graceful empty results).
+const EXERCISE = ['logcat_recent', 'logcat_history', 'logcat_events', 'crash_sessions', 'app_info', 'activity_current', 'input_keyevent', 'app_launch', 'app_stop', 'screen_capture']
+for (const toolName of EXERCISE) {
+  const tool = tools.find((t) => t.name === toolName)
+  if (tool === undefined) { console.log(`MISSING TOOL: ${toolName}`); continue }
+  const result = await tool.execute({ lines: 5, package: 'com.android.settings', key: 'home' })
+  console.log(`${toolName} execute:`, JSON.stringify(result).slice(0, 200))
+}
+
+// Critical tool count check.
+const EXPECTED = 30
+if (tools.length !== EXPECTED) {
+  console.log(`FAIL: expected ${EXPECTED} tools, got ${tools.length}`)
+  process.exitCode = 1
 }
 
 if (status.ready) {

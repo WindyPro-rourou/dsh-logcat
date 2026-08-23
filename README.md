@@ -12,18 +12,34 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
 - **Logcat 面板**（侧边栏「Logcat」入口，右侧抽屉，**宽度可拖拽调整并记忆**）：
   - 设备下拉（显示型号/序列号/状态，记住上次选择）
   - 级别过滤（V/D/I/W/E/F 单选，颜色与 Android Studio 一致）
-  - 关键词过滤、**测试包名输入框**（回车设置，与 agent 的 `logcat_set_package` 互通，状态栏实时显示）
+  - 关键词过滤（**空格分隔多关键词 = 任一命中**）、**测试包名输入框**（回车设置，与 agent 的 `logcat_set_package` 互通，状态栏实时显示）
   - **截图按钮**：一键截取真机屏幕并下载 PNG（`exec-out screencap`）
   - **崩溃高亮**：FATAL EXCEPTION / ANR 行红色高亮，一眼定位崩溃
+  - **历史回溯按钮**：从磁盘加载落盘历史日志（重启 GUI 不丢，与实时缓冲合并显示且按时间戳去重）
+  - **崩溃自动快照**：流中出现 FATAL EXCEPTION / ANR 时自动截图 + 上下文落盘 `~/.dsh/logcat/crashes`，
+    面板弹提示条，可随时在「崩溃」弹窗里查看截图与日志
+  - **events 事件视图**：一键开启 `logcat -b events` 实时流，看应用启动/崩溃/生命周期事件
+  - **WiFi 无线调试向导**：输入 IP/端口/配对码，自动 `adb pair` + `adb connect`，摆脱数据线（Android 11+）
+  - **装APK 按钮**：本地文件选择器选 APK 直接安装到当前设备（流式上传，1GB 上限）
+  - **设备快捷按键**：Home / 返回 / 最近任务 / 唤醒 / 电源 / 音量 ± 一键发送
+  - **性能曲线**：CPU / 内存 / 电量每 2s 采样，状态栏 sparkline 趋势图
+  - **屏幕实时投屏与远程操控**：「屏幕」tab 开启 ~1fps 实时画面（WS 二进制帧推送），**点击=点按、拖动=滑动**、
+    文字输入框直接发到手机、快捷按键（Home/返回/唤醒/音量）、一键下载当前帧 —— 不用拿起手机
+  - **逆向工作台（日志/屏幕/逆向三 tab）**：进程列表 → 内存 hex/字符串搜索 → 匹配地址 → 点击转储 256B 查看
   - 暂停/继续（暂停时缓冲，恢复自动回放）、清空、复制、导出 .txt
   - 窗口化渲染 + 自动滚动（滚动手动上翻时自动停用）
   - 未授权设备提示「请在手机上点击允许 USB 调试」
-- **Agent 工具**（共 21 个，全部对 agent 开放，前置提示中已明示可调用）：
-  - 设备：`logcat_devices`（列出设备）、`device_info`（型号/版本/SDK/分辨率/内存/电量）、`device_stats`（CPU/内存/电量实时采样）
-  - 执行：`adb_exec`（shell）、`adb_install`（本地 APK 装真机）、`adb_pull`（拉文件）
-  - 输入：`input_tap` / `input_swipe` / `input_text`（真机 UI 自动化）、`ui_dump`（界面层级 XML）
-  - 日志：`logcat_recent`（按包名/级别/关键词过滤）、`logcat_crash`（崩溃/ANR 自动捕获 + 上下文）、
-    `logcat_set_package`（锁定当前测试包名）
+- **Agent 工具**（共 30 个，全部对 agent 开放，前置提示中已明示可调用）：
+  - 设备：`logcat_devices`（列出设备）、`device_info`（型号/版本/SDK/分辨率/内存/电量）、`device_stats`（CPU/内存/电量实时采样）、
+    `app_info`（已安装应用版本号/versionCode/APK 路径）
+  - 屏幕/多模态：`screen_capture`（截图存档 + 嵌入对话图片块，多模态模型可直接看图配合 `input_*` 修 bug）
+  - 执行：`adb_exec`（shell）、`adb_install`（本地 APK 装真机）、`adb_pull`（拉文件）、
+    `app_launch`（启动应用/指定 Activity）、`app_stop`（force-stop，破坏性先确认）
+  - 输入：`input_tap` / `input_swipe` / `input_text` / `input_keyevent`（真机 UI 自动化）、`ui_dump`（界面层级 XML）、
+    `activity_current`（当前前台 Activity）
+  - 日志：`logcat_recent`（按包名/级别/关键词过滤）、`logcat_history`（磁盘历史日志回溯，重启不丢）、
+    `logcat_crash`（崩溃/ANR 自动捕获 + 上下文）、`logcat_events`（events 事件缓冲）、
+    `crash_sessions`（崩溃自动快照历史）、`logcat_set_package`（锁定当前测试包名）
   - 逆向/内存：`proc_list`（进程列表）、`proc_maps`（内存映射 + so 模块基址）、`proc_status`（进程状态/内存摘要）、
     `proc_smaps`（smaps 明细，Pss Top 区域）、`mem_dump`（指定地址读内存 hex）、
     `mem_search`（内存搜 hex 模式/字符串）、`frida_server`（frida-server 部署/启停）、
@@ -35,7 +51,13 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
   `proc_smaps` 看内存占用明细 → `frida_script` 生成脚本 + `frida_server` 起 frida 做动态插桩。
   读其他应用内存/maps 需要 root 或 debuggable 应用（run-as），工具会给出明确提示。
 - **附加能力**：`POST /api/dsh-logcat/exec` 执行 shell、`POST /api/dsh-logcat/package` 设置包名、
-  `GET /api/dsh-logcat/screenshot` 截屏、`POST /api/dsh-logcat/install-adb` 一键装 adb。
+  `GET /api/dsh-logcat/screenshot` 截屏、`POST /api/dsh-logcat/install-adb` 一键装 adb、
+  `GET /api/dsh-logcat/history` 历史回溯、`GET /api/dsh-logcat/crashes` + `GET /api/dsh-logcat/crash-file` 崩溃快照读取、
+  `POST /api/dsh-logcat/install-apk` 上传安装 APK、`POST /api/dsh-logcat/keyevent` 按键、
+  `POST /api/dsh-logcat/wifi-connect` / `wifi-disconnect` 无线调试、`GET /api/dsh-logcat/processes`、
+  `POST /api/dsh-logcat/mem-search`、`GET /api/dsh-logcat/mem-dump`。
+- **数据落盘**：日志按设备按天写入 `~/.dsh/logcat/logs/<serial>/logcat-MM-DD.log`（原始 threadtime 行）；
+  崩溃快照存 `~/.dsh/logcat/crashes/<serial>/<时间戳>-<FATAL|ANR>/`（`screenshot.png` + `crash.log` + `meta.json`）。
 
 ## 安装
 
