@@ -7,3 +7,7 @@ node_modules/
 .npmrc.tmp
 
 tmp-*
+
+# build artifact: the dex itself is embedded as base64 in lib/injector-jar.js
+# (rebuild with tools/injector/build.mjs)
+lib/injector.jar
