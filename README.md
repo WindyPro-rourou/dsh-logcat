@@ -59,6 +59,9 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
 - **逆向工作流**：`proc_list` 定位进程 → `proc_maps` 拿模块基址 → `mem_dump` 读目标地址 / `mem_search` 搜特征模式 →
   `proc_smaps` 看内存占用明细 → `frida_script` 生成脚本 + `frida_server` 起 frida 做动态插桩。
   读其他应用内存/maps 需要 root 或 debuggable 应用（run-as），工具会给出明确提示。
+- **原生集成（DSH 0.2）**：通过官方槽位挂载为「中央面板 + 左侧栏 Logcat 图标」（`main` + `sidebar.panellist`），
+  与内置面板同样的停靠/主题/布局体验；`dsh.client.inject` 已按 0.2 清单修正。旧版客户端（0.1.x）自动退回右侧抽屉，
+  一份安装通用。图标为内置 SVG 图标集（不依赖图标包），配色优先取宿主 `--dsw-*` 设计 token。
 - **附加能力**：`POST /api/dsh-logcat/exec` 执行 shell、`POST /api/dsh-logcat/package` 设置包名、
   `GET /api/dsh-logcat/screenshot` 截屏、`POST /api/dsh-logcat/install-adb` 一键装 adb、
   `GET /api/dsh-logcat/history` 历史回溯、`GET /api/dsh-logcat/crashes` + `GET /api/dsh-logcat/crash-file` 崩溃快照读取、
