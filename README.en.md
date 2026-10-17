@@ -73,10 +73,13 @@ The same package is mirrored to GitHub Packages for environments that only want 
 dsh plugin --profile web add @windypro-rourou/dsh-logcat   # resolves through the registry above
 ```
 
-Maintainer publish (token needs `write:packages`; the script reads the credential from the environment only):
+Maintainer publish (both scripts **auto-load credentials**: they use the environment when present,
+otherwise they dot-source the portable loader `$env:DSH_HOME\env\load-secrets.ps1`; credentials only
+live in the process environment and are never written to disk):
 
 ```powershell
-$env:GH_TOKEN = "<PAT with write:packages>"; ./publish-github-packages.ps1
+./publish-npm.ps1                 # → npmjs.org (primary, needs NPM_TOKEN)
+./publish-github-packages.ps1     # → GitHub Packages (needs GH_TOKEN with write:packages)
 ```
 
 ## Release policy (main / latest first)

@@ -104,10 +104,12 @@ dsh plugin --profile web add @windypro-rourou/dsh-logcat@preview
 dsh plugin --profile web add @windypro-rourou/dsh-logcat   # 走上面配置的源
 ```
 
-维护者发布（token 需 `write:packages`，脚本只从环境变量取凭证，不落盘）：
+维护者发布（两个脚本都会**自动读取**凭据：有环境变量就用，没有就 dot-source 便携版加载器
+`$env:DSH_HOME\env\load-secrets.ps1`，凭证只进进程环境、不落盘）：
 
 ```powershell
-$env:GH_TOKEN = "<PAT with write:packages>"; ./publish-github-packages.ps1
+./publish-npm.ps1                 # → npmjs.org（主通道，需 NPM_TOKEN）
+./publish-github-packages.ps1     # → GitHub Packages（需 GH_TOKEN: write:packages）
 ```
 
 ## 发布策略（main / latest 为主）

@@ -11,11 +11,23 @@
     $env:GH_TOKEN = "ghp_xxx"      # or github_pat_xxx
     ./publish-github-packages.ps1
 
+  Auto-load: when GH_TOKEN is not already set, the script dot-sources the portable
+  DSH loader ($env:DSH_HOME\env\load-secrets.ps1, or $env:DSH_SECRETS), so a
+  machine with the portable secrets in place needs no manual export at all.
+
   Notes:
     - GitHub Packages keeps only the `latest` dist-tag; `preview` exists on npmjs.org only.
     - Installing from this registry always requires auth, even for public packages.
 #>
 $ErrorActionPreference = 'Stop'
+
+# Auto-load credentials when the session does not carry them yet.
+if (-not $env:GH_TOKEN) {
+  $loader = $null
+  if ($env:DSH_HOME) { $loader = Join-Path $env:DSH_HOME 'env\load-secrets.ps1' }
+  if (-not $loader -and $env:DSH_SECRETS) { $loader = $env:DSH_SECRETS }
+  if ($loader -and (Test-Path -LiteralPath $loader)) { . $loader -Quiet }
+}
 
 if (-not $env:GH_TOKEN) { throw 'set GH_TOKEN to a PAT with write:packages before running this script' }
 
