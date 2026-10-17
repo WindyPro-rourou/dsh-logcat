@@ -8,6 +8,9 @@ release tooling; it must never contain secret values.
 - Credentials come from the environment (portable DSH launcher injects them) or can be loaded
   on demand: `. "$env:DSH_HOME\env\load-secrets.ps1"`. **Never ask the user for tokens and never
   commit them.**
+- The secrets file (`<portable>\data\portable-secrets.env`) is part of the portable tree and
+  travels with it. Copy the **whole folder**, not just `data\dsh-home`; never hard-code a drive
+  letter — the launcher and loader both resolve by their own location.
 - Publish with the scripts — they auto-load credentials when the variables are absent:
   - `./publish-npm.ps1` → npmjs.org (`latest`, primary channel)
   - `./publish-github-packages.ps1` → GitHub Packages (mirror, `latest` only)
