@@ -56,6 +56,29 @@ dsh plugin --profile web update                # latest within the current major
 dsh plugin --profile web add @windypro-rourou/dsh-logcat@preview
 ```
 
+### Optional: GitHub Packages registry (npm.pkg.github.com)
+
+The same package is mirrored to GitHub Packages for environments that only want GitHub credentials. Two caveats:
+
+- **Installing always requires auth**: the GitHub Packages npm registry wants a token (`read:packages`) even for public packages.
+- **Only the `latest` dist-tag exists there**; the `preview` channel is npmjs.org-only.
+
+```ini
+# ~/.npmrc
+@windypro-rourou:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```bash
+dsh plugin --profile web add @windypro-rourou/dsh-logcat   # resolves through the registry above
+```
+
+Maintainer publish (token needs `write:packages`; the script reads the credential from the environment only):
+
+```powershell
+$env:GH_TOKEN = "<PAT with write:packages>"; ./publish-github-packages.ps1
+```
+
 ## Release policy (main / latest first)
 
 - **`main` branch + npm `latest` tag**: stable releases — the main update channel. Features ship to main/latest as soon as a batch is ready.

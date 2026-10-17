@@ -87,6 +87,29 @@ dsh plugin --profile web update                # 升到当前 major 内最新
 dsh plugin --profile web add @windypro-rourou/dsh-logcat@preview
 ```
 
+### 可选：GitHub Packages 通道（npm.pkg.github.com）
+
+同一份包也会镜像到 GitHub Packages，适合只愿意使用 GitHub 凭据的环境。两点需要注意：
+
+- **安装必须鉴权**：GitHub Packages 的 npm 源即使对公开包也要求 token（`read:packages`）
+- **该源仅支持 `latest` 一个 dist-tag**：`preview` 通道只在 npmjs.org 提供
+
+```ini
+# ~/.npmrc
+@windypro-rourou:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```bash
+dsh plugin --profile web add @windypro-rourou/dsh-logcat   # 走上面配置的源
+```
+
+维护者发布（token 需 `write:packages`，脚本只从环境变量取凭证，不落盘）：
+
+```powershell
+$env:GH_TOKEN = "<PAT with write:packages>"; ./publish-github-packages.ps1
+```
+
 ## 发布策略（main / latest 为主）
 
 - **`main` 分支 + npm `latest` 标签**：正式版，更新的主要通道 —— 功能攒够一批就发，直接推 main/latest。
