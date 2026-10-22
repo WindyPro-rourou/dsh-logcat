@@ -69,8 +69,15 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
   `POST /api/dsh-logcat/install-apk` 上传安装 APK、`POST /api/dsh-logcat/keyevent` 按键、
   `POST /api/dsh-logcat/wifi-connect` / `wifi-disconnect` 无线调试、`GET /api/dsh-logcat/processes`、
   `POST /api/dsh-logcat/mem-search`、`GET /api/dsh-logcat/mem-dump`。
-- **数据落盘**：日志按设备按天写入 `~/.dsh/logcat/logs/<serial>/logcat-MM-DD.log`（原始 threadtime 行）；
-  崩溃快照存 `~/.dsh/logcat/crashes/<serial>/<时间戳>-<FATAL|ANR>/`（`screenshot.png` + `crash.log` + `meta.json`）。
+- **数据落盘（有界）**：日志按设备按天写入 `~/.dsh/logcat/logs/<serial>/logcat-MM-DD.log`（原始 threadtime 行）；
+  单日超过上限自动滚动为 `.001/.002…` 分卷，并按保留天数与单设备总量上限清理最旧文件。
+  默认 64MB/分卷、保留 14 天、512MB/设备；可用环境变量覆盖：`DSH_LOGCAT_DAY_MB`、
+  `DSH_LOGCAT_RETAIN_DAYS`、`DSH_LOGCAT_MAX_MB`，`DSH_LOGCAT_PERSIST=off` 完全关闭落盘
+  （实时流、`logcat_recent`、`logcat_crash` 不受影响）。崩溃快照存 `~/.dsh/logcat/crashes/<serial>/<时间戳>-<FATAL|ANR>/`
+  （`screenshot.png` + `crash.log` + `meta.json`）；注入器辅助进程（`app_process` 下运行的 `dsh.Injector`）自身的崩溃不会写入快照。
+- **手势注入器**：`tap/swipe/keyevent` 默认走常驻注入器（单次几毫秒），部署时对 dex 显式 `chmod 600`
+  （Android 14+ 的 `app_process` 拒绝加载全局可写 dex）；连续 3 次启动失败自动停用并回落原生命令，
+  设备重新上线后自动恢复尝试。
 
 ## 安装
 
