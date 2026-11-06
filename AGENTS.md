@@ -26,9 +26,17 @@ release tooling; it must never contain secret values.
 ```sh
 node --check lib/index.js lib/client.js
 node selfcheck.mjs          # 30 host tools registered
+node tmp-bundle-smoke.mjs   # bundle evaluates with NO global React (host-faithful)
 node tmp-rendertest.cjs     # drawer renders without a white screen
 node tmp-native-test.cjs    # drawer is the default; native panel is opt-in
+node tmp-issue2-smoke.mjs   # persistence bounds + injector backoff
 ```
+
+- `tmp-bundle-smoke.mjs` exists because 0.9.1 shipped `React.memo` without binding
+  `React`: the old harness loaded the React UMD build, which sets `window.React`, so the
+  stray reference resolved in tests and only failed in the real host. **Never reintroduce a
+  global `React`/`window.React` in a harness** — the host injects `react` through the module
+  loader's `require` and exposes no global. Same rule for any other host-provided global.
 
 ## UI
 
