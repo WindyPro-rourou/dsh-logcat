@@ -63,6 +63,14 @@ DSH Web GUI 的安卓实机调试面板（类似 Android Studio 的 Logcat 视�
   想要常驻面板时，在浏览器控制台执行 `window.__DSH_LOGCAT_NATIVE_PANEL__ = true` 后刷新，即改用官方
   `main`（中央面板）+ `sidebar.panellist`（左栏图标）挂载。`dsh.client.inject` 已按 0.2 清单修正；
   图标为内置 SVG 图标集（不依赖图标包），配色优先取宿主 `--dsw-*` 设计 token。
+- **性能（0.9.0 起批量投递）**：宿主机把 60ms 内的日志合并成一个 `lines` 帧下发（事件缓冲同理用 `elines`），
+  面板一次更新一批，而不是一行一次 WS 帧 + 一次全量重渲染。实测：
+  同一条日志流下客户端主线程开销 **5335 → 240 ms / 1000 行（约 22×）**，
+  服务端吞吐 **78.8k → 391k 行/秒（约 5×）**，2 万行只发 **10 帧**（原来 2 万帧）。
+  环形缓冲改为「攒够 512 行再一次性裁剪」，落盘改批量写；无过滤条件时跳过整表过滤。
+  旧客户端仍兼容 `line` 帧，新客户端同时认 `lines`。
+- **adb 自动发现**：除 `ANDROID_HOME`/`ANDROID_SDK_ROOT`/`%LOCALAPPDATA%\Android\Sdk`/插件自装目录外，
+  还会探测便携工具链 `<DSH_HOME>\env\android-sdk\platform-tools\adb.exe`——便携盘上无需再配 PATH。
 - **附加能力**：`POST /api/dsh-logcat/exec` 执行 shell、`POST /api/dsh-logcat/package` 设置包名、
   `GET /api/dsh-logcat/screenshot` 截屏、`POST /api/dsh-logcat/install-adb` 一键装 adb、
   `GET /api/dsh-logcat/history` 历史回溯、`GET /api/dsh-logcat/crashes` + `GET /api/dsh-logcat/crash-file` 崩溃快照读取、
