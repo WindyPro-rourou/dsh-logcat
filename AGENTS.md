@@ -30,7 +30,19 @@ node tmp-bundle-smoke.mjs   # bundle evaluates with NO global React (host-faithf
 node tmp-rendertest.cjs     # drawer renders without a white screen
 node tmp-native-test.cjs    # drawer is the default; native panel is opt-in
 node tmp-issue2-smoke.mjs   # persistence bounds + injector backoff
+node tmp-overlap.cjs        # no control overlaps across drawer widths
+node tmp-encoding-audit.mjs .   # every shipped file is valid UTF-8
+node tmp-normalize-meta.mjs # package.json/cordis.patch.yml stay ASCII-only
 ```
+
+- `tmp-encoding-audit.mjs` + `tmp-normalize-meta.mjs` exist because issue #4 reported
+  garbled text in the published metadata. Anything a UI may truncate by **bytes**
+  (package description, bundle patch) must stay pure ASCII so a slice can never split a
+  multibyte character; Chinese belongs in the README/docs, which are read as UTF-8.
+- `tmp-overlap.cjs` exists because issue #3 was a layout defect that no screenshot-free
+  review caught by eye: `input[type=text]` defaults to `content-box` while
+  `input[type=search]` is `border-box`, so one control rendered 10px taller than its row.
+  Form controls are now normalised to `border-box` with one shared 26px height.
 
 - `tmp-bundle-smoke.mjs` exists because 0.9.1 shipped `React.memo` without binding
   `React`: the old harness loaded the React UMD build, which sets `window.React`, so the
