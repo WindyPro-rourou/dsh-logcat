@@ -33,7 +33,16 @@ node tmp-issue2-smoke.mjs   # persistence bounds + injector backoff
 node tmp-overlap.cjs        # no control overlaps across drawer widths
 node tmp-encoding-audit.mjs .   # every shipped file is valid UTF-8
 node tmp-normalize-meta.mjs # package.json/cordis.patch.yml stay ASCII-only
+node tmp-stats-route.mjs    # /stats parses memory/battery/cpu on a real device
+node tmp-selfheal.cjs       # empty device list recovers without a reload
 ```
+
+- `tmp-stats-route.mjs` and `tmp-selfheal.cjs` exist because 0.9.4 fixed two
+  user-visible bugs: `collectStats` never stripped the `:` separator (so memory,
+  battery and CPU were always blank — `"status: 2".slice(6)` is `": 2"`), and a
+  panel opened before the host/device was ready stayed on "无设备" forever because
+  nothing re-sent the roster. `tmp-selfheal.cjs` reproduces that exact screen and
+  proves the 3-second `/status` re-poll recovers it with no reload.
 
 - `tmp-encoding-audit.mjs` + `tmp-normalize-meta.mjs` exist because issue #4 reported
   garbled text in the published metadata. Anything a UI may truncate by **bytes**
