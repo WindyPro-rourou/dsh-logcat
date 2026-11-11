@@ -1,7 +1,7 @@
 {
   "name": "@windypro-rourou/dsh-logcat",
   "description": "Android Logcat viewer for the DSH Web GUI: live adb logcat stream with level/keyword filters, pause/clear/export, crash snapshots, remote screen control, and 30 agent tools.",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "type": "module",
   "packageManager": "pnpm@11.22.0",
   "engines": {

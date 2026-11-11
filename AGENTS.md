@@ -35,7 +35,18 @@ node tmp-encoding-audit.mjs .   # every shipped file is valid UTF-8
 node tmp-normalize-meta.mjs # package.json/cordis.patch.yml stay ASCII-only
 node tmp-stats-route.mjs    # /stats parses memory/battery/cpu on a real device
 node tmp-selfheal.cjs       # empty device list recovers without a reload
+node tmp-video-isolation.mjs    # screen bytes only reach subscribed panels
+node tmp-video-e2e.mjs          # late subscriber still gets svideo-init (needs a device)
 ```
+
+- `tmp-video-isolation.mjs` / `tmp-video-e2e.mjs` exist because 0.9.5 fixed a
+  nasty coupling: H.264 frames (~1.75 MB/s) were broadcast to **every** panel, so a
+  panel on the log tab still swallowed megabytes per second; once `bufferedAmount`
+  passed the drop threshold in `broadcast()`, **log frames were dropped too** —
+  mirroring and logs broke together. Screen bytes now go only to clients that sent
+  `{type:"video"|"screen", on:true}` (`ws.__screenSubscribed`), and the last
+  `svideo-init` is cached per device and replayed to late subscribers (a panel that
+  joined mid-stream used to get frames but no decoder config => black screen).
 
 - `tmp-stats-route.mjs` and `tmp-selfheal.cjs` exist because 0.9.4 fixed two
   user-visible bugs: `collectStats` never stripped the `:` separator (so memory,
